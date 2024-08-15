@@ -1,6 +1,9 @@
 const isDictionary = (v) => { return v.constructor == Object }
 
 export const el = (tag, klass, attributes, contents) => {
+  const sanitize = trustedTypes.createPolicy("htmlEscapePolicy", {
+    createHTML: (string) => string.replace(/</g, "&lt;"),
+  });
   const element = document.createElement(tag);
   if (attributes && attributes.className) {
     element.classList.add(attributes.className);
@@ -28,7 +31,7 @@ export const el = (tag, klass, attributes, contents) => {
   if (!!contents) {
     if (typeof contents == "string") {
       let textNode = document.createElement("span");
-      textNode.innerHTML = contents;
+      textNode.innerHTML = sanitize.createHTML(contents);
       element.appendChild(textNode);
     } else if (typeof contents == "object" && contents.length) {
       for (let child of contents) {
